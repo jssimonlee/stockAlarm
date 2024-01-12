@@ -1,0 +1,4 @@
+FinanceDataReader
+streamlit
+pandas
+pyupbit
