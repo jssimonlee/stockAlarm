@@ -3,3 +3,4 @@ streamlit
 pandas
 pyupbit
 beautifulsoup4
+plotly
