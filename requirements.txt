@@ -1,4 +1,4 @@
-finance-datareader==0.9.30
+finance-datareader==0.9.50
 streamlit
 pandas
 pyupbit
