@@ -1,14 +1,17 @@
-import FinanceDataReader as fdr
 import datetime
 import streamlit as st
 import pandas as pd
 import time
 import pyupbit
+import yfinance as yf
+from pandas_datareader import data as pdr
+yf.pdr_override()
 
 
 st.set_page_config(layout="wide")
 pw = st.text_input("비번을 넣으세요", type="password")
 if pw == st.secrets["pw"] or pw == st.secrets["pwopen"]: 
+
     df = pd.DataFrame()
 
     def makeSignal(stock_symbol,maxCur1Rate,minCur1Rate):
@@ -37,7 +40,7 @@ if pw == st.secrets["pw"] or pw == st.secrets["pwopen"]:
         stock_symbol = ticker.replace("(3X)","")
         start_date = datetime.date.today() - datetime.timedelta(365*3)
         end_date = datetime.date.today()
-        stock_data = fdr.DataReader(stock_symbol, start_date, end_date)
+        stock_data = pdr.get_data_yahoo(stock_symbol, start_date, end_date)
 
         curPrice = stock_data.iloc[-1]['Close']
         max3Year = stock_data['Close'].max()
@@ -53,7 +56,7 @@ if pw == st.secrets["pw"] or pw == st.secrets["pwopen"]:
         signal = makeSignal(ticker,maxCur1Rate,minCur1Rate)
 
         ind = [ticker,round(curPrice,2),round(max3Year,2),round(max2Year,2),round(max1Year,2),round(min3Year,2),round(min2Year,2),round(min1Year,2),round(maxCur3Rate,2),round(maxCur2Rate,2),round(maxCur1Rate,2),round(minCur1Rate,2),signal]
-        column = ["종목","현재가","3년최고","2년최고","1년최고","3년최저","2년최저","1년최저","3년고비","2년고비","1년고비","1년저비","Signal"]
+        column = ["종목","현재가","3년최고","2년최고","1년최고","3년최저","2년최저","1년최저","3년고비","2년고비","1년고비","1년저비","매수/매도 Signal"]
         # df = pd.DataFrame()
         if len(df) == 0:
             df = pd.DataFrame([ind],columns=column)
@@ -80,18 +83,18 @@ if pw == st.secrets["pw"] or pw == st.secrets["pwopen"]:
         minCur1Rate = (curPrice-min1Year)/min1Year*100
         signal = makeSignal(ticker,maxCur1Rate,minCur1Rate)
         ind = [ticker,round(curPrice,2),round(max3Year,2),round(max2Year,2),round(max1Year,2),round(min3Year,2),round(min2Year,2),round(min1Year,2),round(maxCur3Rate,2),round(maxCur2Rate,2),round(maxCur1Rate,2),round(minCur1Rate,2),signal]
-        column = ["종목","현재가","3년최고","2년최고","1년최고","3년최저","2년최저","1년최저","3년고비","2년고비","1년고비","1년저비","Signal"]
+        column = ["종목","현재가","3년최고","2년최고","1년최고","3년최저","2년최저","1년최저","3년고비","2년고비","1년고비","1년저비","매수/매도 Signal"]
         df1 = pd.DataFrame([ind],columns=column)
         df1.set_index(keys='종목',inplace=True)
         df = pd.concat([df,df1])
 
-    checkList = ["TQQQ(3X)","TMF(3X)","FNGU(3X)","BULZ(3X)","LABU(3X)","UPRO(3X)","SOXL(3X)","SOXX","BNKU(3X)","SCHD","TSLY","QQQ","SPY","TSLA","AAPL","IBIT"]
+    checkList = ["TQQQ(3X)","TMF(3X)","FNGU(3X)","BULZ(3X)","LABU(3X)","LABD(3X)","UPRO(3X)","SOXL(3X)","SOXX","BNKU(3X)","SCHD","TSLY","QQQ","SPY","TSLA","AAPL","IBIT"]
     for i in checkList:
         # i = i.replace("(3X)","")
         checkStock(i)
         time.sleep(0.2)
     checkBitCoin()
-
+    pd.set_option('display.max_colwidth', None)
     st.write(df.style.format({"현재가": "{:.2f}","3년최고": "{:.2f}","2년최고": "{:.2f}","1년최고": "{:.2f}","3년최저": "{:.2f}","2년최저": "{:.2f}",
                             "1년최저": "{:.2f}","3년고비": "{:.2f}","2년고비": "{:.2f}","1년고비": "{:.2f}","1년저비": "{:.2f}"}))
-# st.table(df)
+    # st.table(df)
