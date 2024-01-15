@@ -1,7 +1,7 @@
-yfinance
+finance-datareader
 streamlit
 pandas
 pyupbit
 beautifulsoup4
 plotly
-pandas_datareader
+
